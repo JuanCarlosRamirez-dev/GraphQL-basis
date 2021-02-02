@@ -1,7 +1,8 @@
 import express from 'express';
 import compression from 'compression';
-const { graphqlHTTP } = require('express-graphql');
 import schema from "./schema/index";
+import {ApolloServer} from "apollo-server-express";
+import { createServer } from 'http';
 //import cors from 'cors';
 
 const app = express();
@@ -10,14 +11,18 @@ const app = express();
 
 app.use(compression());
 
-app.use('/', graphqlHTTP({
+const server = new ApolloServer({
     schema,
-    graphiql: true
-}));
+    introspection: true
+})
+
+server.applyMiddleware({app})
 
 const PORT = 8080;
 
-app.listen(
+const httpServer = createServer(app)
+
+httpServer.listen(
     {port: PORT},
     ()=>console.log(`Listening on port: http://localhost:${PORT}/graphql`)
 );
